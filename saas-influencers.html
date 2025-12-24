@@ -38,6 +38,15 @@
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
         }
 
+        /* Link Hover Effects */
+        .platform-link {
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        .platform-link:hover {
+            background-color: #f3f4f6;
+            border-radius: 6px;
+        }
+
         /* Custom Scrollbar for inner content */
         ::-webkit-scrollbar {
             width: 8px;
@@ -55,18 +64,18 @@
     </style>
     <!-- Chosen Palette: Warm Neutrals (Stone/Beige) with Slate text and subtle Indigo accents for interactivity. -->
     <!-- Application Structure Plan: 
-         1. Header & Context: Sets the stage for the copywriter persona, explaining the value of these 20 names.
-         2. Strategic Overview (Dashboard): High-level stats and visualizations (Platform dominance, Niche split) to give immediate market context.
-         3. The Influence Matrix (Interactive Grid): The core list. detailed cards with stats, niche, and 'Signature Strategy'. Filterable by Category to allow targeted research.
-         4. Interaction Flow: User sees big picture -> Filters to specific interest (e.g., SaaS) -> Drills down into specific influencer tactics. 
+         1. Header & Context: Sets the stage for the copywriter persona.
+         2. Strategic Overview (Dashboard): High-level stats and visualizations.
+         3. The Influence Matrix (Interactive Grid): The core list. Now updated with clickable platform rows that open external profiles in new tabs.
+         4. Interaction Flow: Filter -> Analyze Strategy -> Click through to source material (Social Profiles).
     -->
     <!-- Visualization & Content Choices:
-         1. Goal: Compare Reach -> Method: Bar Chart (Avg Followers per Platform) -> Interaction: None (Static benchmark).
-         2. Goal: Niche Distribution -> Method: Doughnut Chart -> Interaction: Click legend to toggle visibility.
-         3. Goal: Inform/List -> Method: Interactive Grid of Cards -> Interaction: JS Filtering and Sorting. 
-         4. Justification: Charts provide the "Macro" view of where the industry is moving (e.g., video dominance), while the grid provides the "Micro" data needed for business dev.
+         1. Goal: Connect -> Method: Hyperlinked Rows in Cards -> Interaction: Hover states + New Tab Navigation.
+         2. Goal: Compare Reach -> Method: Bar Chart -> Interaction: None.
+         3. Goal: Niche Distribution -> Method: Doughnut Chart -> Interaction: Click legend.
+         4. Justification: Direct links allow the user to immediately verify the "Signature Strategy" by viewing the content.
     -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. Unicode used for icons. -->
 </head>
 <body class="antialiased min-h-screen flex flex-col">
 
@@ -95,9 +104,8 @@
                 <h2 class="text-xl font-bold text-stone-800 mb-2">Research Objective</h2>
                 <p class="text-stone-600 leading-relaxed">
                     This interactive report identifies the 20 most consequential voices in SaaS and Marketing. 
-                    For a copywriter seeking business opportunities, these individuals represent not just targets, but 
-                    <strong>blueprints for modern content strategy</strong>. We have prioritized leaders with strong video presence 
-                    (YouTube, TikTok, Instagram) as this is where the current B2B engagement war is being fought.
+                    <strong>Click on the platform rows</strong> within each card to directly access their channels and study their content.
+                    We have prioritized leaders with strong video presence to serve as your blueprints for modern content strategy.
                 </p>
             </div>
         </section>
@@ -136,7 +144,7 @@
             <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
                 <div>
                     <h2 class="text-2xl font-bold text-stone-800">The Leaderboard</h2>
-                    <p class="text-stone-500">Explore the profiles, tactics, and primary channels.</p>
+                    <p class="text-stone-500">Filter by niche and click platforms to explore.</p>
                 </div>
                 
                 <!-- Controls -->
@@ -163,13 +171,14 @@
 
     <!-- Script Section -->
     <script>
-        // --- Data Source: The "Report" Content ---
+        // --- Data Source: The "Report" Content with Handles ---
         const influencers = [
             {
                 name: "Alex Hormozi",
                 role: "Founder, Acquisition.com",
-                niche: "SaaS", // Technically Biz/SaaS
+                niche: "SaaS",
                 platforms: { yt: "2.1M", ig: "2.8M", tt: "1.4M" },
+                handles: { yt: "@AlexHormozi", ig: "hormozi", tt: "@hormozi" },
                 strategy: "Volume & Value. Uses short-form hooks to drive to deep-dive long-form operational playbooks.",
                 reachScore: 6300000
             },
@@ -178,6 +187,7 @@
                 role: "CEO, VaynerMedia",
                 niche: "Marketing",
                 platforms: { yt: "4.3M", ig: "10M", tt: "15M" },
+                handles: { yt: "@garyvee", ig: "garyvee", tt: "@garyvee" },
                 strategy: "Document, Don't Create. The godfather of repurposed content at scale.",
                 reachScore: 29300000
             },
@@ -186,6 +196,7 @@
                 role: "Founder, NP Digital",
                 niche: "Marketing",
                 platforms: { yt: "1.2M", ig: "500K", tt: "300K" },
+                handles: { yt: "@neilpatel", ig: "neilpatel", tt: "@neilpatel" },
                 strategy: "Data-Driven SEO. Uses bite-sized tips to drive traffic to software tools (Ubersuggest).",
                 reachScore: 2000000
             },
@@ -194,14 +205,16 @@
                 role: "Founder, AppSumo",
                 niche: "SaaS",
                 platforms: { yt: "1.1M", ig: "300K", tt: "500K" },
+                handles: { yt: "@noahkagan", ig: "noahkagan", tt: "@noahkagan" },
                 strategy: "Transparency. 'Knocking on doors' and revealing exact financial numbers of businesses.",
                 reachScore: 1900000
             },
             {
                 name: "Codie Sanchez",
                 role: "Contrarian Thinking",
-                niche: "SaaS", // Biz/SaaS adjacent
+                niche: "SaaS",
                 platforms: { yt: "1.3M", ig: "2.1M", tt: "2.5M" },
+                handles: { yt: "@CodieSanchezCT", ig: "codiesanchez", tt: "@codiesanchez" },
                 strategy: "Boring Business. Glorifies cash-flow positive boring businesses with high-energy visuals.",
                 reachScore: 5900000
             },
@@ -210,6 +223,7 @@
                 role: "Co-Founder, ClickFunnels",
                 niche: "SaaS",
                 platforms: { yt: "300K", ig: "1.1M", tt: "100K" },
+                handles: { yt: "@RussellBrunson", ig: "russellbrunson", tt: "@russellbrunson" },
                 strategy: "The Attractive Character. Master of storytelling and funnel psychology.",
                 reachScore: 1500000
             },
@@ -218,6 +232,7 @@
                 role: "Diary of a CEO",
                 niche: "Marketing",
                 platforms: { yt: "6.5M", ig: "3.2M", tt: "2.8M" },
+                handles: { yt: "@TheDiaryOfACEO", ig: "steven", tt: "@stevenbartlett" },
                 strategy: "Vulnerability. High production value interviews that extract raw emotion.",
                 reachScore: 12500000
             },
@@ -226,6 +241,7 @@
                 role: "Founder, The Futur",
                 niche: "Marketing",
                 platforms: { yt: "2.4M", ig: "1.1M", tt: "800K" },
+                handles: { yt: "@thefutur", ig: "thechrisdo", tt: "@thechrisdo" },
                 strategy: "Design Thinking. Uses typography and carousel aesthetics to teach business concepts.",
                 reachScore: 4300000
             },
@@ -233,7 +249,8 @@
                 name: "Nathan Latka",
                 role: "Founder, SaaSOpen",
                 niche: "SaaS",
-                platforms: { yt: "30K", ig: "20K", tt: "10K" }, // Niche but high value
+                platforms: { yt: "30K", ig: "20K", tt: "10K" },
+                handles: { yt: "@NathanLatka", ig: "nathanlatka", tt: "@nathanlatka" },
                 strategy: "Hard Data. Aggressive interview style extracting ARR, churn, and cap table data.",
                 reachScore: 60000
             },
@@ -242,6 +259,7 @@
                 role: "Founder, AgenciFlow",
                 niche: "SaaS",
                 platforms: { yt: "4.5M", ig: "2.2M", tt: "800K" },
+                handles: { yt: "@ImanGadzhi", ig: "imangadzhi", tt: "@imangadzhi" },
                 strategy: "Lifestyle Aspiration. Sells the agency/SaaS lifestyle with cinematic vlog quality.",
                 reachScore: 7500000
             },
@@ -250,7 +268,8 @@
                 role: "Creator Economy Coach",
                 niche: "Marketing",
                 platforms: { yt: "700K", ig: "300K", tt: "150K" },
-                strategy: "Tactical Tutorials. extremely actionable, step-by-step social media growth guides.",
+                handles: { yt: "@VanessaLau", ig: "vanessalauco", tt: "@vanessalauco" },
+                strategy: "Tactical Tutorials. Extremely actionable, step-by-step social media growth guides.",
                 reachScore: 1150000
             },
             {
@@ -258,6 +277,7 @@
                 role: "SaaS Academy",
                 niche: "SaaS",
                 platforms: { yt: "150K", ig: "400K", tt: "200K" },
+                handles: { yt: "@danmartell", ig: "danmartell", tt: "@danmartell" },
                 strategy: "The Playbook. Targeted advice specifically for B2B SaaS founders scaling past $10M.",
                 reachScore: 750000
             },
@@ -266,6 +286,7 @@
                 role: "Single Grain / Leveling Up",
                 niche: "Marketing",
                 platforms: { yt: "90K", ig: "100K", tt: "50K" },
+                handles: { yt: "@LevelingUpOfficial", ig: "ericosiu", tt: "@ericosiu" },
                 strategy: "Collaborative Wisdom. Leverages networks (like Neil Patel) to share high-level insights.",
                 reachScore: 240000
             },
@@ -274,6 +295,7 @@
                 role: "Creator Science",
                 niche: "Marketing",
                 platforms: { yt: "50K", ig: "80K", tt: "30K" },
+                handles: { yt: "@creator-science", ig: "jayclouse", tt: "@jayclouse" },
                 strategy: "Scientific Method. Treats content creation as a data experiment with rigorous testing.",
                 reachScore: 160000
             },
@@ -282,6 +304,7 @@
                 role: "GTM Strategies",
                 niche: "SaaS",
                 platforms: { yt: "60K", ig: "10K", tt: "5K" },
+                handles: { yt: "@TKKader", ig: "tkkader", tt: "@tkkader" },
                 strategy: "The Framework. Sunday releases of specific Go-To-Market movements for SaaS.",
                 reachScore: 75000
             },
@@ -290,6 +313,7 @@
                 role: "My First Million",
                 niche: "SaaS",
                 platforms: { yt: "500K", ig: "150K", tt: "400K" },
+                handles: { yt: "@MyFirstMillionPod", ig: "shaanpuri", tt: "@shaanpuri" },
                 strategy: "Brainstorming. Unscripted, high-energy business idea generation.",
                 reachScore: 1050000
             },
@@ -297,7 +321,8 @@
                 name: "Justin Welsh",
                 role: "The Diversified Solopreneur",
                 niche: "SaaS",
-                platforms: { yt: "10K", ig: "200K", tt: "10K" }, // LinkedIn main, but growing IG
+                platforms: { yt: "10K", ig: "200K", tt: "10K" },
+                handles: { yt: "@JustinWelsh", ig: "thejustinwelsh", tt: "@thejustinwelsh" },
                 strategy: "Systems. Breaking down complex solopreneur paths into repeatable systems.",
                 reachScore: 220000
             },
@@ -306,6 +331,7 @@
                 role: "Productivity/Tech",
                 niche: "Marketing",
                 platforms: { yt: "5.1M", ig: "800K", tt: "400K" },
+                handles: { yt: "@aliabdaal", ig: "aliabdaal", tt: "@aliabdaal" },
                 strategy: "Productivity Porn. High aesthetic reviews of tools, tech, and life systems.",
                 reachScore: 6300000
             },
@@ -314,6 +340,7 @@
                 role: "AI & Future Tech",
                 niche: "SaaS",
                 platforms: { yt: "250K", ig: "50K", tt: "100K" },
+                handles: { yt: "@BrettMalinowski", ig: "thebrettmalinowski", tt: "@thebrettmalinowski" },
                 strategy: "The Edge. Focusing entirely on the intersection of AI tools and SaaS building.",
                 reachScore: 400000
             },
@@ -322,6 +349,7 @@
                 role: "Smart Passive Income",
                 niche: "Marketing",
                 platforms: { yt: "400K", ig: "100K", tt: "50K" },
+                handles: { yt: "@patflynn", ig: "patflynn", tt: "@patflynn" },
                 strategy: "Relatability. The 'crash test dummy' of online business, sharing wins and failures.",
                 reachScore: 550000
             }
@@ -360,6 +388,11 @@
                 const headerColor = person.niche === 'SaaS' ? 'bg-indigo-50 text-indigo-700' : 'bg-orange-50 text-orange-700';
                 const pillColor = person.niche === 'SaaS' ? 'bg-indigo-100 text-indigo-800' : 'bg-orange-100 text-orange-800';
 
+                // URL Construction
+                const ytUrl = `https://youtube.com/${person.handles.yt}`;
+                const igUrl = `https://instagram.com/${person.handles.ig}`;
+                const ttUrl = `https://tiktok.com/${person.handles.tt}`;
+
                 card.innerHTML = `
                     <div class="p-6 flex-grow">
                         <div class="flex justify-between items-start mb-4">
@@ -370,25 +403,42 @@
                             <span class="px-2 py-1 rounded-full text-xs font-semibold ${pillColor}">${person.niche}</span>
                         </div>
                         
-                        <div class="space-y-3 mb-6">
-                            <div class="flex items-center justify-between text-sm text-stone-600">
+                        <div class="space-y-2 mb-6">
+                            <!-- YouTube Link -->
+                            <a href="${ytUrl}" target="_blank" rel="noopener noreferrer" class="platform-link flex items-center justify-between text-sm text-stone-600 p-2 -mx-2 group cursor-pointer" title="Open YouTube Channel">
                                 <div class="flex items-center gap-2">
-                                    <span class="text-red-600 font-bold">▶</span> YouTube
+                                    <span class="text-red-600 font-bold group-hover:scale-110 transition-transform">▶</span> 
+                                    <span class="group-hover:text-red-700 font-medium">YouTube</span>
                                 </div>
-                                <span class="font-medium">${person.platforms.yt}</span>
-                            </div>
-                            <div class="flex items-center justify-between text-sm text-stone-600">
+                                <div class="flex items-center gap-1">
+                                    <span class="font-bold text-stone-700">${person.platforms.yt}</span>
+                                    <span class="text-stone-300 group-hover:text-red-400">↗</span>
+                                </div>
+                            </a>
+
+                            <!-- Instagram Link -->
+                            <a href="${igUrl}" target="_blank" rel="noopener noreferrer" class="platform-link flex items-center justify-between text-sm text-stone-600 p-2 -mx-2 group cursor-pointer" title="Open Instagram Profile">
                                 <div class="flex items-center gap-2">
-                                    <span class="text-pink-600 font-bold">📸</span> Instagram
+                                    <span class="text-pink-600 font-bold group-hover:scale-110 transition-transform">📸</span> 
+                                    <span class="group-hover:text-pink-700 font-medium">Instagram</span>
                                 </div>
-                                <span class="font-medium">${person.platforms.ig}</span>
-                            </div>
-                            <div class="flex items-center justify-between text-sm text-stone-600">
+                                <div class="flex items-center gap-1">
+                                    <span class="font-bold text-stone-700">${person.platforms.ig}</span>
+                                    <span class="text-stone-300 group-hover:text-pink-400">↗</span>
+                                </div>
+                            </a>
+
+                            <!-- TikTok Link -->
+                            <a href="${ttUrl}" target="_blank" rel="noopener noreferrer" class="platform-link flex items-center justify-between text-sm text-stone-600 p-2 -mx-2 group cursor-pointer" title="Open TikTok Profile">
                                 <div class="flex items-center gap-2">
-                                    <span class="text-black font-bold">🎵</span> TikTok
+                                    <span class="text-black font-bold group-hover:scale-110 transition-transform">🎵</span> 
+                                    <span class="group-hover:text-stone-900 font-medium">TikTok</span>
                                 </div>
-                                <span class="font-medium">${person.platforms.tt}</span>
-                            </div>
+                                <div class="flex items-center gap-1">
+                                    <span class="font-bold text-stone-700">${person.platforms.tt}</span>
+                                    <span class="text-stone-300 group-hover:text-stone-500">↗</span>
+                                </div>
+                            </a>
                         </div>
 
                         <div class="bg-stone-50 p-3 rounded-lg">
@@ -433,9 +483,6 @@
             
             renderGrid(filtered);
             calculateStats(filtered);
-            
-            // Note: Charts are global summaries, so we usually keep them static or update them. 
-            // For this UX, keeping charts as "Industry Overviews" is better, so we won't redraw charts on filter.
         }
 
         // --- Chart Initialization ---
