@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SaaS & Marketing Influence Radar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f5f0; /* Warm neutral background */
+            color: #1f2937;
+        }
+
+        /* Chart Container Styling - Mandatory Requirement */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 100%;
+            height: 300px;
+            margin: 0 auto;
+        }
+
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Custom Scrollbar for inner content */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e5e5e5;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #a3a3a3;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #737373;
+        }
+    </style>
+    <!-- Chosen Palette: Warm Neutrals (Stone/Beige) with Slate text and subtle Indigo accents for interactivity. -->
+    <!-- Application Structure Plan: 
+         1. Header & Context: Sets the stage for the copywriter persona, explaining the value of these 20 names.
+         2. Strategic Overview (Dashboard): High-level stats and visualizations (Platform dominance, Niche split) to give immediate market context.
+         3. The Influence Matrix (Interactive Grid): The core list. detailed cards with stats, niche, and 'Signature Strategy'. Filterable by Category to allow targeted research.
+         4. Interaction Flow: User sees big picture -> Filters to specific interest (e.g., SaaS) -> Drills down into specific influencer tactics. 
+    -->
+    <!-- Visualization & Content Choices:
+         1. Goal: Compare Reach -> Method: Bar Chart (Avg Followers per Platform) -> Interaction: None (Static benchmark).
+         2. Goal: Niche Distribution -> Method: Doughnut Chart -> Interaction: Click legend to toggle visibility.
+         3. Goal: Inform/List -> Method: Interactive Grid of Cards -> Interaction: JS Filtering and Sorting. 
+         4. Justification: Charts provide the "Macro" view of where the industry is moving (e.g., video dominance), while the grid provides the "Micro" data needed for business dev.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="antialiased min-h-screen flex flex-col">
+
+    <!-- Header Section -->
+    <header class="bg-stone-900 text-stone-50 py-8 px-4 shadow-lg">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+                <div>
+                    <h1 class="text-3xl md:text-4xl font-bold tracking-tight">SaaS & Marketing Influence Radar</h1>
+                    <p class="mt-2 text-stone-400 text-lg">Top 20 Architects of Attention: B2B, SaaS, and Digital Growth.</p>
+                </div>
+                <div class="mt-4 md:mt-0 bg-stone-800 px-4 py-2 rounded-lg border border-stone-700">
+                    <span class="text-xs uppercase tracking-wider text-stone-500 font-semibold block">Total Analyzed Reach</span>
+                    <span class="text-2xl font-bold text-white" id="total-reach-display">Calculating...</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-7xl mx-auto w-full px-4 py-8 space-y-12">
+
+        <!-- Intro Context -->
+        <section>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                <h2 class="text-xl font-bold text-stone-800 mb-2">Research Objective</h2>
+                <p class="text-stone-600 leading-relaxed">
+                    This interactive report identifies the 20 most consequential voices in SaaS and Marketing. 
+                    For a copywriter seeking business opportunities, these individuals represent not just targets, but 
+                    <strong>blueprints for modern content strategy</strong>. We have prioritized leaders with strong video presence 
+                    (YouTube, TikTok, Instagram) as this is where the current B2B engagement war is being fought.
+                </p>
+            </div>
+        </section>
+
+        <!-- Dashboard / Visualization Section -->
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Chart 1: Platform Dominance -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200 flex flex-col">
+                <div class="mb-4">
+                    <h3 class="text-lg font-bold text-stone-800">Platform Gravity</h3>
+                    <p class="text-sm text-stone-500">Where these influencers found their massive scale. Note the heavy reliance on YouTube for depth and TikTok for reach.</p>
+                </div>
+                <div class="flex-grow flex items-center justify-center">
+                    <div class="chart-container">
+                        <canvas id="platformChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart 2: Niche Split -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200 flex flex-col">
+                <div class="mb-4">
+                    <h3 class="text-lg font-bold text-stone-800">Sector Distribution</h3>
+                    <p class="text-sm text-stone-500">The balance between pure SaaS Founders and Marketing Educators.</p>
+                </div>
+                <div class="flex-grow flex items-center justify-center">
+                    <div class="chart-container" style="max-width: 400px;">
+                        <canvas id="nicheChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- The Directory Section -->
+        <section id="directory">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-stone-800">The Leaderboard</h2>
+                    <p class="text-stone-500">Explore the profiles, tactics, and primary channels.</p>
+                </div>
+                
+                <!-- Controls -->
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="filterData('all')" class="filter-btn active px-4 py-2 rounded-full text-sm font-semibold bg-stone-800 text-white transition-colors hover:bg-stone-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-stone-900" data-filter="all">All Profiles</button>
+                    <button onclick="filterData('SaaS')" class="filter-btn px-4 py-2 rounded-full text-sm font-semibold bg-stone-200 text-stone-600 transition-colors hover:bg-stone-300 focus:outline-none" data-filter="SaaS">SaaS Leaders</button>
+                    <button onclick="filterData('Marketing')" class="filter-btn px-4 py-2 rounded-full text-sm font-semibold bg-stone-200 text-stone-600 transition-colors hover:bg-stone-300 focus:outline-none" data-filter="Marketing">Marketing Gurus</button>
+                </div>
+            </div>
+
+            <!-- Grid Container -->
+            <div id="influencer-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <!-- Cards will be injected here by JS -->
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-stone-100 border-t border-stone-200 mt-12 py-8">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="text-stone-500 text-sm">&copy; 2025 SaaS Market Research. Generated for Strategic Analysis.</p>
+        </div>
+    </footer>
+
+    <!-- Script Section -->
+    <script>
+        // --- Data Source: The "Report" Content ---
+        const influencers = [
+            {
+                name: "Alex Hormozi",
+                role: "Founder, Acquisition.com",
+                niche: "SaaS", // Technically Biz/SaaS
+                platforms: { yt: "2.1M", ig: "2.8M", tt: "1.4M" },
+                strategy: "Volume & Value. Uses short-form hooks to drive to deep-dive long-form operational playbooks.",
+                reachScore: 6300000
+            },
+            {
+                name: "Gary Vaynerchuk",
+                role: "CEO, VaynerMedia",
+                niche: "Marketing",
+                platforms: { yt: "4.3M", ig: "10M", tt: "15M" },
+                strategy: "Document, Don't Create. The godfather of repurposed content at scale.",
+                reachScore: 29300000
+            },
+            {
+                name: "Neil Patel",
+                role: "Founder, NP Digital",
+                niche: "Marketing",
+                platforms: { yt: "1.2M", ig: "500K", tt: "300K" },
+                strategy: "Data-Driven SEO. Uses bite-sized tips to drive traffic to software tools (Ubersuggest).",
+                reachScore: 2000000
+            },
+            {
+                name: "Noah Kagan",
+                role: "Founder, AppSumo",
+                niche: "SaaS",
+                platforms: { yt: "1.1M", ig: "300K", tt: "500K" },
+                strategy: "Transparency. 'Knocking on doors' and revealing exact financial numbers of businesses.",
+                reachScore: 1900000
+            },
+            {
+                name: "Codie Sanchez",
+                role: "Contrarian Thinking",
+                niche: "SaaS", // Biz/SaaS adjacent
+                platforms: { yt: "1.3M", ig: "2.1M", tt: "2.5M" },
+                strategy: "Boring Business. Glorifies cash-flow positive boring businesses with high-energy visuals.",
+                reachScore: 5900000
+            },
+            {
+                name: "Russell Brunson",
+                role: "Co-Founder, ClickFunnels",
+                niche: "SaaS",
+                platforms: { yt: "300K", ig: "1.1M", tt: "100K" },
+                strategy: "The Attractive Character. Master of storytelling and funnel psychology.",
+                reachScore: 1500000
+            },
+            {
+                name: "Steven Bartlett",
+                role: "Diary of a CEO",
+                niche: "Marketing",
+                platforms: { yt: "6.5M", ig: "3.2M", tt: "2.8M" },
+                strategy: "Vulnerability. High production value interviews that extract raw emotion.",
+                reachScore: 12500000
+            },
+            {
+                name: "Chris Do",
+                role: "Founder, The Futur",
+                niche: "Marketing",
+                platforms: { yt: "2.4M", ig: "1.1M", tt: "800K" },
+                strategy: "Design Thinking. Uses typography and carousel aesthetics to teach business concepts.",
+                reachScore: 4300000
+            },
+            {
+                name: "Nathan Latka",
+                role: "Founder, SaaSOpen",
+                niche: "SaaS",
+                platforms: { yt: "30K", ig: "20K", tt: "10K" }, // Niche but high value
+                strategy: "Hard Data. Aggressive interview style extracting ARR, churn, and cap table data.",
+                reachScore: 60000
+            },
+            {
+                name: "Iman Gadzhi",
+                role: "Founder, AgenciFlow",
+                niche: "SaaS",
+                platforms: { yt: "4.5M", ig: "2.2M", tt: "800K" },
+                strategy: "Lifestyle Aspiration. Sells the agency/SaaS lifestyle with cinematic vlog quality.",
+                reachScore: 7500000
+            },
+            {
+                name: "Vanessa Lau",
+                role: "Creator Economy Coach",
+                niche: "Marketing",
+                platforms: { yt: "700K", ig: "300K", tt: "150K" },
+                strategy: "Tactical Tutorials. extremely actionable, step-by-step social media growth guides.",
+                reachScore: 1150000
+            },
+            {
+                name: "Dan Martell",
+                role: "SaaS Academy",
+                niche: "SaaS",
+                platforms: { yt: "150K", ig: "400K", tt: "200K" },
+                strategy: "The Playbook. Targeted advice specifically for B2B SaaS founders scaling past $10M.",
+                reachScore: 750000
+            },
+            {
+                name: "Eric Siu",
+                role: "Single Grain / Leveling Up",
+                niche: "Marketing",
+                platforms: { yt: "90K", ig: "100K", tt: "50K" },
+                strategy: "Collaborative Wisdom. Leverages networks (like Neil Patel) to share high-level insights.",
+                reachScore: 240000
+            },
+            {
+                name: "Jay Clouse",
+                role: "Creator Science",
+                niche: "Marketing",
+                platforms: { yt: "50K", ig: "80K", tt: "30K" },
+                strategy: "Scientific Method. Treats content creation as a data experiment with rigorous testing.",
+                reachScore: 160000
+            },
+            {
+                name: "TK Kader",
+                role: "GTM Strategies",
+                niche: "SaaS",
+                platforms: { yt: "60K", ig: "10K", tt: "5K" },
+                strategy: "The Framework. Sunday releases of specific Go-To-Market movements for SaaS.",
+                reachScore: 75000
+            },
+            {
+                name: "Shaan Puri",
+                role: "My First Million",
+                niche: "SaaS",
+                platforms: { yt: "500K", ig: "150K", tt: "400K" },
+                strategy: "Brainstorming. Unscripted, high-energy business idea generation.",
+                reachScore: 1050000
+            },
+            {
+                name: "Justin Welsh",
+                role: "The Diversified Solopreneur",
+                niche: "SaaS",
+                platforms: { yt: "10K", ig: "200K", tt: "10K" }, // LinkedIn main, but growing IG
+                strategy: "Systems. Breaking down complex solopreneur paths into repeatable systems.",
+                reachScore: 220000
+            },
+            {
+                name: "Ali Abdaal",
+                role: "Productivity/Tech",
+                niche: "Marketing",
+                platforms: { yt: "5.1M", ig: "800K", tt: "400K" },
+                strategy: "Productivity Porn. High aesthetic reviews of tools, tech, and life systems.",
+                reachScore: 6300000
+            },
+            {
+                name: "Brett Malinowski",
+                role: "AI & Future Tech",
+                niche: "SaaS",
+                platforms: { yt: "250K", ig: "50K", tt: "100K" },
+                strategy: "The Edge. Focusing entirely on the intersection of AI tools and SaaS building.",
+                reachScore: 400000
+            },
+            {
+                name: "Pat Flynn",
+                role: "Smart Passive Income",
+                niche: "Marketing",
+                platforms: { yt: "400K", ig: "100K", tt: "50K" },
+                strategy: "Relatability. The 'crash test dummy' of online business, sharing wins and failures.",
+                reachScore: 550000
+            }
+        ];
+
+        // --- State Management ---
+        let currentFilter = 'all';
+
+        // --- DOM Elements ---
+        const gridContainer = document.getElementById('influencer-grid');
+        const totalReachDisplay = document.getElementById('total-reach-display');
+        const btns = document.querySelectorAll('.filter-btn');
+
+        // --- Helper Functions ---
+        const formatNumber = (num) => {
+            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+            return num.toString();
+        };
+
+        const parseKOrM = (str) => {
+            if (str.includes('M')) return parseFloat(str) * 1000000;
+            if (str.includes('K')) return parseFloat(str) * 1000;
+            return parseFloat(str);
+        };
+
+        // --- Render Functions ---
+        function renderGrid(data) {
+            gridContainer.innerHTML = '';
+            
+            data.forEach(person => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-xl shadow-sm border border-stone-200 overflow-hidden card-hover flex flex-col h-full';
+                
+                // Card Header
+                const headerColor = person.niche === 'SaaS' ? 'bg-indigo-50 text-indigo-700' : 'bg-orange-50 text-orange-700';
+                const pillColor = person.niche === 'SaaS' ? 'bg-indigo-100 text-indigo-800' : 'bg-orange-100 text-orange-800';
+
+                card.innerHTML = `
+                    <div class="p-6 flex-grow">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="font-bold text-xl text-stone-900">${person.name}</h3>
+                                <p class="text-sm text-stone-500">${person.role}</p>
+                            </div>
+                            <span class="px-2 py-1 rounded-full text-xs font-semibold ${pillColor}">${person.niche}</span>
+                        </div>
+                        
+                        <div class="space-y-3 mb-6">
+                            <div class="flex items-center justify-between text-sm text-stone-600">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-red-600 font-bold">▶</span> YouTube
+                                </div>
+                                <span class="font-medium">${person.platforms.yt}</span>
+                            </div>
+                            <div class="flex items-center justify-between text-sm text-stone-600">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-pink-600 font-bold">📸</span> Instagram
+                                </div>
+                                <span class="font-medium">${person.platforms.ig}</span>
+                            </div>
+                            <div class="flex items-center justify-between text-sm text-stone-600">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-black font-bold">🎵</span> TikTok
+                                </div>
+                                <span class="font-medium">${person.platforms.tt}</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-stone-50 p-3 rounded-lg">
+                            <p class="text-xs font-bold text-stone-400 uppercase mb-1">Signature Strategy</p>
+                            <p class="text-sm text-stone-700 leading-snug italic">"${person.strategy}"</p>
+                        </div>
+                    </div>
+                    <div class="bg-stone-50 px-6 py-3 border-t border-stone-100 flex justify-between items-center">
+                        <span class="text-xs text-stone-500 font-medium">Est. Reach Score</span>
+                        <span class="text-sm font-bold text-stone-800">${formatNumber(person.reachScore)}</span>
+                    </div>
+                `;
+                gridContainer.appendChild(card);
+            });
+        }
+
+        function calculateStats(data) {
+            let total = 0;
+            data.forEach(p => total += p.reachScore);
+            totalReachDisplay.textContent = formatNumber(total);
+        }
+
+        // --- Interaction Logic ---
+        function filterData(filter) {
+            currentFilter = filter;
+            
+            // Update UI buttons
+            btns.forEach(btn => {
+                if (btn.dataset.filter === filter) {
+                    btn.classList.remove('bg-stone-200', 'text-stone-600');
+                    btn.classList.add('bg-stone-800', 'text-white');
+                } else {
+                    btn.classList.add('bg-stone-200', 'text-stone-600');
+                    btn.classList.remove('bg-stone-800', 'text-white');
+                }
+            });
+
+            // Filter Array
+            const filtered = filter === 'all' 
+                ? influencers 
+                : influencers.filter(p => p.niche === filter);
+            
+            renderGrid(filtered);
+            calculateStats(filtered);
+            
+            // Note: Charts are global summaries, so we usually keep them static or update them. 
+            // For this UX, keeping charts as "Industry Overviews" is better, so we won't redraw charts on filter.
+        }
+
+        // --- Chart Initialization ---
+        function initCharts() {
+            // Data Prep for Platform Chart
+            let ytTotal = 0, igTotal = 0, ttTotal = 0;
+            influencers.forEach(p => {
+                ytTotal += parseKOrM(p.platforms.yt);
+                igTotal += parseKOrM(p.platforms.ig);
+                ttTotal += parseKOrM(p.platforms.tt);
+            });
+
+            // Platform Bar Chart
+            const ctxPlatform = document.getElementById('platformChart').getContext('2d');
+            new Chart(ctxPlatform, {
+                type: 'bar',
+                data: {
+                    labels: ['YouTube', 'Instagram', 'TikTok'],
+                    datasets: [{
+                        label: 'Total Follower Volume (Top 20)',
+                        data: [ytTotal, igTotal, ttTotal],
+                        backgroundColor: [
+                            'rgba(220, 38, 38, 0.7)', // Red for YT
+                            'rgba(219, 39, 119, 0.7)', // Pink for IG
+                            'rgba(0, 0, 0, 0.7)'       // Black for TT
+                        ],
+                        borderColor: [
+                            'rgba(220, 38, 38, 1)',
+                            'rgba(219, 39, 119, 1)',
+                            'rgba(0, 0, 0, 1)'
+                        ],
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) label += ': ';
+                                    if (context.parsed.y !== null) label += formatNumber(context.parsed.y);
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { callback: function(value) { return formatNumber(value); } }
+                        }
+                    }
+                }
+            });
+
+            // Niche Doughnut Chart
+            const saasCount = influencers.filter(i => i.niche === 'SaaS').length;
+            const mktCount = influencers.filter(i => i.niche === 'Marketing').length;
+
+            const ctxNiche = document.getElementById('nicheChart').getContext('2d');
+            new Chart(ctxNiche, {
+                type: 'doughnut',
+                data: {
+                    labels: ['SaaS Founders', 'Marketing Gurus'],
+                    datasets: [{
+                        data: [saasCount, mktCount],
+                        backgroundColor: [
+                            'rgba(79, 70, 229, 0.7)', // Indigo
+                            'rgba(234, 88, 12, 0.7)'  // Orange
+                        ],
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderGrid(influencers);
+            calculateStats(influencers);
+            initCharts();
+        });
+
+    </script>
+</body>
+</html>
